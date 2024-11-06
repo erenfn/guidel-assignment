@@ -12,8 +12,8 @@ class MapScreen extends StatefulWidget {
 }
 
 class MapScreenState extends State<MapScreen> {
-  LatLng _currentPosition =
-      const LatLng(41.0082, 28.9784); // Default placeholder (Istanbul)
+  LatLng _initialPosition = const LatLng(41.0082, 28.9784); // Default initial location (Istanbul)
+  LatLng _currentPosition = const LatLng(41.0082, 28.9784);
   Set<Marker> _markers = {};
   late GoogleMapController mapController;
   double _zoomLevel = 15.0; // Default zoom level
@@ -25,14 +25,13 @@ class MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _initializeMap() async {
-    _currentPosition = await LocationService
-        .getCurrentLocation(); // Get custom or actual location
+    _currentPosition = await LocationService.getCurrentLocation(); // Get current location
+    _initialPosition = _currentPosition; // Set initial position to current location
     _updateMarkers();
   }
 
   Future<void> _updateMarkers() async {
-    final markers =
-        await PlacesService.fetchNearbyRestaurants(_currentPosition);
+    final markers = await PlacesService.fetchNearbyRestaurants(_currentPosition);
     setState(() {
       _markers = markers;
     });
@@ -64,6 +63,15 @@ class MapScreenState extends State<MapScreen> {
     }
   }
 
+  // Reset camera to initial position
+  void _resetPosition() {
+    mapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: _initialPosition, zoom: _zoomLevel),
+      ),
+    );
+  }
+
   // This will be called when the camera position changes (e.g., zooming or panning)
   void _onCameraMove(CameraPosition position) {
     setState(() {
@@ -74,31 +82,6 @@ class MapScreenState extends State<MapScreen> {
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
-
-    // Handle mouse scroll zoom functionality
-  void _handleZoomScroll(DragUpdateDetails details) {
-    // Increase zoom when scrolling up, decrease zoom when scrolling down
-    if (details.primaryDelta! > 0) {
-      // Scrolling down (zoom out)
-      if (_zoomLevel < 20) {
-        setState(() {
-          _zoomLevel++;
-        });
-      }
-    } else if (details.primaryDelta! < 0) {
-      // Scrolling up (zoom in)
-      if (_zoomLevel > 3) {
-        setState(() {
-          _zoomLevel--;
-        });
-      }
-    }
-
-    mapController.animateCamera(
-      CameraUpdate.newCameraPosition(CameraPosition(target: _currentPosition, zoom: _zoomLevel)),
-    );
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -115,15 +98,16 @@ class MapScreenState extends State<MapScreen> {
             initialCameraPosition: CameraPosition(target: _currentPosition, zoom: _zoomLevel),
             markers: _markers,
             onCameraMove: _onCameraMove,
-            zoomControlsEnabled: false, // to manually create the zoom in and zoom out buttons
+            zoomControlsEnabled: false, // Manually create zoom in and zoom out buttons
           ),
-          // Position Zoom Buttons at the bottom right
+          // Position Zoom and Reset Buttons at the bottom right
           Positioned(
             bottom: 30,
             right: 15,
             child: ZoomButtonsWidget(
               onZoomIn: _zoomIn,
               onZoomOut: _zoomOut,
+              onResetPosition: _resetPosition, // Pass reset position callback
             ),
           ),
         ],
