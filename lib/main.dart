@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'MapScreen/map_screen.dart'; // Import the new file
+import 'screens/map_screen.dart';
 
 void main() async {
   await dotenv.load();  // Load the .env file

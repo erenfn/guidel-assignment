@@ -9,7 +9,7 @@ import java.util.Properties
 
 // Load .env file for Google Maps API Key
 def dotenv = new Properties()
-file("../.env").withInputStream { dotenv.load(it) }
+file("../../.env").withInputStream { dotenv.load(it) }
 
 android {
     namespace = "com.example.guidel_assignment"
