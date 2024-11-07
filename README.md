@@ -8,7 +8,7 @@ This app allows users to view nearby restaurants on a map based on their current
 - **Interactive Map**: Zoom in/out of the map and move around to view restaurants in different areas.
 - **Search Button**: Refreshes the nearby restaurants based on the current center of the map.
 - **Zoom Controls**: Custom zoom-in and zoom-out buttons to control the map's zoom level.
-- **Dynamic Markers**: Displays markers for restaurants that include the name and location.
+- **Dynamic Markers**: Displays markers for restaurants that include the name, location, and image.
 
 ## Requirements
 
@@ -58,7 +58,7 @@ This app allows users to view nearby restaurants on a map based on their current
 
 3. **Zoom and Search**: The user can zoom in or out using the custom zoom buttons. When the map is moved and 'Search here' button is clicked, the app updates the list of nearby restaurants based on the new center of the map.
 
-4. **Markers**: Each restaurant is displayed as a marker on the map. Tapping on a marker shows the restaurant's name and vicinity in the info window.
+4. **Markers**: Each restaurant is displayed as a marker on the map. Tapping on a marker shows the restaurant's name, coordinates, and image in the info window.
 
 
 ### Dependencies
@@ -66,7 +66,7 @@ This app allows users to view nearby restaurants on a map based on their current
 - `google_maps_flutter`: A Flutter plugin for displaying Google Maps.
 - `http`: A package for making HTTP requests to the Google Places API.
 - `flutter_dotenv`: A Flutter package for loading environment variables from a `.env` file.
-- geolocator: A Flutter plugin for accessing the device's location services to fetch the user's current location.
+- `geolocator`: A Flutter plugin for accessing the device's location services to fetch the user's current location.
 
 ![App Screenshot](Map_Screenshot.png)
 
