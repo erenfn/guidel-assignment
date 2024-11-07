@@ -12,9 +12,8 @@ class MapScreen extends StatefulWidget {
 }
 
 class MapScreenState extends State<MapScreen> {
-  LatLng _initialPosition = const LatLng(41.0082, 28.9784); // Default initial location (Istanbul)
-  LatLng _currentPosition = const LatLng(41.0082, 28.9784);
-  LatLng _currentMapCenter = const LatLng(41.0082, 28.9784); // Stores the map’s current center
+  LatLng _currentPosition = const LatLng(41.0082, 28.9784); // Initial location (Istanbul)
+  LatLng _currentMapCenter = const LatLng(41.0082, 28.9784); // Map's current center
   Set<Marker> _markers = {};
   late GoogleMapController mapController;
   double _zoomLevel = 15.0; // Default zoom level
@@ -27,11 +26,11 @@ class MapScreenState extends State<MapScreen> {
 
   Future<void> _initializeMap() async {
     _currentPosition = await LocationService.getCurrentLocation(); 
-    _initialPosition = _currentPosition; // Set initial position to current location
-    _currentMapCenter = _currentPosition; // Initialize map center with initial location
+    _currentMapCenter = _currentPosition; // Set map center and initial location to current position
     _updateMarkers(_currentPosition); // Fetch POIs for initial position
   }
 
+  // Update markers according to the new center
   Future<void> _updateMarkers(LatLng position) async {
     final markers = await PlacesService.fetchNearbyRestaurants(position);
     setState(() {
@@ -68,7 +67,7 @@ class MapScreenState extends State<MapScreen> {
   void _resetPosition() {
     mapController.animateCamera(
       CameraUpdate.newCameraPosition(
-        CameraPosition(target: _initialPosition, zoom: _zoomLevel),
+        CameraPosition(target: _currentPosition, zoom: _zoomLevel),
       ),
     );
   }
@@ -100,7 +99,7 @@ class MapScreenState extends State<MapScreen> {
           // "Search here" button at the top center
           Positioned(
             top: 10,
-            left: MediaQuery.of(context).size.width * 0.3, // Center the button horizontally
+            left: MediaQuery.of(context).size.width * 0.35, // Center the button horizontally
             child: ElevatedButton(
               onPressed: _searchHere,
               child: const Text("Search here"),

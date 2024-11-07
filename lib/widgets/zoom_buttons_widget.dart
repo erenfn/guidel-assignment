@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class ZoomButtonsWidget extends StatelessWidget {
   final VoidCallback onZoomIn;
   final VoidCallback onZoomOut;
-  final VoidCallback onResetPosition; // Add a new callback
+  final VoidCallback onResetPosition; 
 
   const ZoomButtonsWidget({
     super.key,
     required this.onZoomIn,
     required this.onZoomOut,
-    required this.onResetPosition, // Required parameter for the new button
+    required this.onResetPosition, 
   });
 
   @override
@@ -29,7 +29,7 @@ class ZoomButtonsWidget extends StatelessWidget {
         FloatingActionButton(
           onPressed: onZoomIn,
           backgroundColor: Theme.of(context).colorScheme.primary,
-          child: const Icon(Icons.zoom_in),
+          child: const Icon(Icons.zoom_in, size: 30.0),
         ),
         const SizedBox(height: 10),
         
@@ -37,7 +37,7 @@ class ZoomButtonsWidget extends StatelessWidget {
         FloatingActionButton(
           onPressed: onZoomOut,
           backgroundColor: Theme.of(context).colorScheme.primary,
-          child: const Icon(Icons.zoom_out),
+          child: const Icon(Icons.zoom_out, size: 30.0),
         ),
       ],
     );
