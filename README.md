@@ -52,7 +52,7 @@ This app allows users to view nearby restaurants on a map based on their current
 
 ## How it Works
 
-1. **Initialization**: Upon starting the app, the map is centered on the user's current location. Default location is Istanbul.
+1. **Initialization**: Upon starting the app, the map is centered on the user's current location. 
 
 2. **Fetching Nearby Restaurants**: The app uses the Google Places API to fetch nearby restaurants within a 1km radius of the user's location. These restaurants are displayed as markers on the map.
 
@@ -66,5 +66,6 @@ This app allows users to view nearby restaurants on a map based on their current
 - `google_maps_flutter`: A Flutter plugin for displaying Google Maps.
 - `http`: A package for making HTTP requests to the Google Places API.
 - `flutter_dotenv`: A Flutter package for loading environment variables from a `.env` file.
+- geolocator: A Flutter plugin for accessing the device's location services to fetch the user's current location.
 
 
