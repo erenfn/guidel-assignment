@@ -14,6 +14,7 @@ class MapScreen extends StatefulWidget {
 class MapScreenState extends State<MapScreen> {
   LatLng _initialPosition = const LatLng(41.0082, 28.9784); // Default initial location (Istanbul)
   LatLng _currentPosition = const LatLng(41.0082, 28.9784);
+  LatLng _currentMapCenter = const LatLng(41.0082, 28.9784); // Stores the map’s current center
   Set<Marker> _markers = {};
   late GoogleMapController mapController;
   double _zoomLevel = 15.0; // Default zoom level
@@ -25,20 +26,22 @@ class MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _initializeMap() async {
-    _currentPosition = await LocationService.getCurrentLocation(); // Get current location
+    _currentPosition = await LocationService.getCurrentLocation(); 
     _initialPosition = _currentPosition; // Set initial position to current location
-    _updateMarkers();
+    _currentMapCenter = _currentPosition; // Initialize map center with initial location
+    _updateMarkers(_currentPosition); // Fetch POIs for initial position
   }
 
-  Future<void> _updateMarkers() async {
-    final markers = await PlacesService.fetchNearbyRestaurants(_currentPosition);
+  Future<void> _updateMarkers(LatLng position) async {
+    final markers = await PlacesService.fetchNearbyRestaurants(position);
     setState(() {
       _markers = markers;
     });
-    mapController.animateCamera(
-      CameraUpdate.newCameraPosition(
-          CameraPosition(target: _currentPosition, zoom: _zoomLevel)),
-    );
+  }
+
+  // Refresh POIs based on current map center
+  void _searchHere() {
+    _updateMarkers(_currentMapCenter); // Use stored map center position
   }
 
   // Function to handle zoom in
@@ -47,8 +50,7 @@ class MapScreenState extends State<MapScreen> {
       setState(() {
         _zoomLevel++;
       });
-      mapController.animateCamera(CameraUpdate.newCameraPosition(
-          CameraPosition(target: _currentPosition, zoom: _zoomLevel)));
+      mapController.animateCamera(CameraUpdate.zoomIn());
     }
   }
 
@@ -58,8 +60,7 @@ class MapScreenState extends State<MapScreen> {
       setState(() {
         _zoomLevel--;
       });
-      mapController.animateCamera(CameraUpdate.newCameraPosition(
-          CameraPosition(target: _currentPosition, zoom: _zoomLevel)));
+      mapController.animateCamera(CameraUpdate.zoomOut());
     }
   }
 
@@ -70,13 +71,6 @@ class MapScreenState extends State<MapScreen> {
         CameraPosition(target: _initialPosition, zoom: _zoomLevel),
       ),
     );
-  }
-
-  // This will be called when the camera position changes (e.g., zooming or panning)
-  void _onCameraMove(CameraPosition position) {
-    setState(() {
-      _zoomLevel = position.zoom; // Update the zoom level as the camera moves
-    });
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -97,8 +91,20 @@ class MapScreenState extends State<MapScreen> {
             onMapCreated: _onMapCreated,
             initialCameraPosition: CameraPosition(target: _currentPosition, zoom: _zoomLevel),
             markers: _markers,
-            onCameraMove: _onCameraMove,
+            onCameraMove: (position) {
+              // Update _currentMapCenter when the camera moves
+              _currentMapCenter = position.target;
+            },
             zoomControlsEnabled: false, // Manually create zoom in and zoom out buttons
+          ),
+          // "Search here" button at the top center
+          Positioned(
+            top: 10,
+            left: MediaQuery.of(context).size.width * 0.3, // Center the button horizontally
+            child: ElevatedButton(
+              onPressed: _searchHere,
+              child: const Text("Search here"),
+            ),
           ),
           // Position Zoom and Reset Buttons at the bottom right
           Positioned(
@@ -107,7 +113,7 @@ class MapScreenState extends State<MapScreen> {
             child: ZoomButtonsWidget(
               onZoomIn: _zoomIn,
               onZoomOut: _zoomOut,
-              onResetPosition: _resetPosition, // Pass reset position callback
+              onResetPosition: _resetPosition,
             ),
           ),
         ],
