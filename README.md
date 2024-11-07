@@ -68,4 +68,5 @@ This app allows users to view nearby restaurants on a map based on their current
 - `flutter_dotenv`: A Flutter package for loading environment variables from a `.env` file.
 - geolocator: A Flutter plugin for accessing the device's location services to fetch the user's current location.
 
+![App Screenshot](Map_Screenshot.png)
 
