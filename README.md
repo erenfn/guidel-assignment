@@ -2,6 +2,8 @@
 
 This app allows users to view nearby restaurants on a map based on their current location. The map is interactive, and users can zoom in, zoom out, and search for restaurants in their vicinity. The app uses Google Maps and Google Places API to fetch and display the information about restaurants.
 
+<img src="Map_Screenshot.png" alt="App Screenshot" width="300"/>
+
 ## Features
 
 - **Display Nearby Restaurants**: Shows nearby restaurants based on the user's current location.
@@ -67,6 +69,4 @@ This app allows users to view nearby restaurants on a map based on their current
 - `http`: A package for making HTTP requests to the Google Places API.
 - `flutter_dotenv`: A Flutter package for loading environment variables from a `.env` file.
 - `geolocator`: A Flutter plugin for accessing the device's location services to fetch the user's current location.
-
-![App Screenshot](Map_Screenshot.png)
 
