@@ -28,6 +28,7 @@ class MapScreenState extends State<MapScreen> {
     _currentPosition = await LocationService.getCurrentLocation(); 
     _currentMapCenter = _currentPosition; // Set map center and initial location to current position
     _updateMarkers(_currentPosition); // Fetch POIs for initial position
+    _resetPosition();
   }
 
   // Update markers according to the new center
