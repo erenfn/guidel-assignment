@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../services/location_service.dart';
 import '../services/places_service.dart';
+import 'package:custom_info_window/custom_info_window.dart';
+import '../services/location_service.dart';
 import '../widgets/zoom_buttons_widget.dart';
 
 class MapScreen extends StatefulWidget {
@@ -12,39 +13,43 @@ class MapScreen extends StatefulWidget {
 }
 
 class MapScreenState extends State<MapScreen> {
-  LatLng _currentPosition = const LatLng(41.0082, 28.9784); // Initial location (Istanbul)
-  LatLng _currentMapCenter = const LatLng(41.0082, 28.9784); // Map's current center
+  LatLng _currentPosition = const LatLng(41.0082, 28.9784); // Istanbul
+  LatLng _currentMapCenter = const LatLng(41.0082, 28.9784);
   Set<Marker> _markers = {};
   late GoogleMapController mapController;
-  double _zoomLevel = 15.0; // Default zoom level
+  late PlacesService _placesService;
+  final CustomInfoWindowController _customInfoWindowController = CustomInfoWindowController();
+  double _zoomLevel = 15.0;
 
   @override
   void initState() {
     super.initState();
+    _placesService = PlacesService(customInfoWindowController: _customInfoWindowController);
     _initializeMap();
   }
 
+  /// Initializes map with user's current position and loads nearby markers
   Future<void> _initializeMap() async {
-    _currentPosition = await LocationService.getCurrentLocation(); 
-    _currentMapCenter = _currentPosition; // Set map center and initial location to current position
-    _updateMarkers(_currentPosition); // Fetch POIs for initial position
+    _currentPosition = await LocationService.getCurrentLocation();
+    _currentMapCenter = _currentPosition;
+    _updateMarkers(_currentPosition);
     _resetPosition();
   }
 
-  // Update markers according to the new center
+  /// Updates markers on the map based on the new position
   Future<void> _updateMarkers(LatLng position) async {
-    final markers = await PlacesService.fetchNearbyRestaurants(position);
+    final markers = await _placesService.fetchNearbyRestaurants(position);
     setState(() {
       _markers = markers;
     });
   }
 
-  // Refresh POIs based on current map center
+  /// Refreshes the map markers at the center of the current view
   void _searchHere() {
-    _updateMarkers(_currentMapCenter); // Use stored map center position
+    _updateMarkers(_currentMapCenter);
   }
 
-  // Function to handle zoom in
+  /// Zooms into the map
   void _zoomIn() {
     if (_zoomLevel < 20) {
       setState(() {
@@ -54,7 +59,7 @@ class MapScreenState extends State<MapScreen> {
     }
   }
 
-  // Function to handle zoom out
+  /// Zooms out of the map
   void _zoomOut() {
     if (_zoomLevel > 3) {
       setState(() {
@@ -64,7 +69,7 @@ class MapScreenState extends State<MapScreen> {
     }
   }
 
-  // Reset camera to initial position
+  /// Resets the map position to the user's current location
   void _resetPosition() {
     mapController.animateCamera(
       CameraUpdate.newCameraPosition(
@@ -73,8 +78,17 @@ class MapScreenState extends State<MapScreen> {
     );
   }
 
+  /// Sets up the map controller and links it with the CustomInfoWindowController
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    _customInfoWindowController.googleMapController = controller;
+  }
+
+  @override
+  void dispose() {
+    // Dispose of the custom info window controller when the widget is destroyed
+    _customInfoWindowController.dispose();
+    super.dispose();
   }
 
   @override
@@ -86,27 +100,36 @@ class MapScreenState extends State<MapScreen> {
       ),
       body: Stack(
         children: [
-          // Show Google Maps
+          // Google Map with markers and custom info window
           GoogleMap(
             onMapCreated: _onMapCreated,
             initialCameraPosition: CameraPosition(target: _currentPosition, zoom: _zoomLevel),
             markers: _markers,
+            // Update _currentMapCenter when the camera moves
             onCameraMove: (position) {
-              // Update _currentMapCenter when the camera moves
               _currentMapCenter = position.target;
+              _customInfoWindowController.onCameraMove!();
             },
-            zoomControlsEnabled: false, // Manually create zoom in and zoom out buttons
+            onTap: (position) => _customInfoWindowController.hideInfoWindow!(),
+            zoomControlsEnabled: false,
           ),
-          // "Search here" button at the top center
+          // Custom info window widget overlay
+          CustomInfoWindow(
+            controller: _customInfoWindowController,
+            height: 150,
+            width: 200,
+            offset: 50,
+          ),
+          // "Search Here" button
           Positioned(
             top: 10,
-            left: MediaQuery.of(context).size.width * 0.35, // Center the button horizontally
+            left: MediaQuery.of(context).size.width * 0.35,
             child: ElevatedButton(
               onPressed: _searchHere,
               child: const Text("Search here"),
             ),
           ),
-          // Position Zoom and Reset Buttons at the bottom right
+          // Zoom controls at the bottom right
           Positioned(
             bottom: 30,
             right: 15,

@@ -3,7 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/map_screen.dart';
 
 void main() async {
-  await dotenv.load();  // Load the .env file
+  await dotenv.load(); 
   runApp(const MyApp());
 }
 
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 233, 46, 46)),
         useMaterial3: true,
       ),
-      home: const MapScreen(), // Set MapScreen as the home
+      home: const MapScreen(),
     );
   }
 }
